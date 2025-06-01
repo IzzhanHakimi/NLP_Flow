@@ -1,0 +1,266 @@
+/* General Reset and Base Styles */
+:root {
+    --bg-color: #1e1e2f; /* Dark blue background */
+    --panel-bg-color: #27293d; /* Slightly lighter panel background */
+    --text-color: #c0c0e0; /* Light lavender text */
+    --accent-color: #8999ff; /* Accent blue for labels, buttons */
+    --input-bg-color: #1a1a2e;
+    --input-border-color: #4a4a6a;
+    --user-message-bg: #3b3b58; /* User message bubble */
+    --assistant-message-bg: #2c2c44; /* Assistant message bubble */
+    --scrollbar-thumb-color: #4a4a6a;
+    --scrollbar-track-color: #27293d;
+    --header-text-color: #e0e0ff;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 1400px; /* Adjust as needed */
+    display: flex;
+    flex-direction: column;
+}
+
+.app-header {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--input-border-color);
+}
+
+.app-header h1 {
+    color: var(--header-text-color);
+    font-size: 1.8em;
+    margin-bottom: 5px;
+}
+.app-header .subtitle {
+    font-size: 0.9em;
+    color: var(--text-color);
+}
+
+
+.main-content {
+    display: flex;
+    gap: 20px;
+    flex-grow: 1;
+    min-height: 0; /* Important for flex children with overflow */
+}
+
+/* Configuration Panel (Left Side) */
+.configuration-panel {
+    flex: 1; /* Takes up 1 part of the space */
+    background-color: var(--panel-bg-color);
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto; /* Scroll if content overflows */
+    max-height: calc(100vh - 120px); /* Adjust based on header/padding */
+}
+
+.configuration-panel h2 {
+    color: var(--header-text-color);
+    margin-bottom: 10px;
+    font-size: 1.4em;
+    border-bottom: 1px solid var(--input-border-color);
+    padding-bottom: 8px;
+}
+
+.config-item label {
+    display: block;
+    font-weight: bold;
+    color: var(--accent-color);
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+.config-item .info-text {
+    display: block;
+    font-size: 0.8em;
+    color: var(--text-color);
+    opacity: 0.8;
+    margin-bottom: 8px;
+}
+
+.config-item input[type="password"],
+.config-item textarea {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--input-bg-color);
+    border: 1px solid var(--input-border-color);
+    color: var(--text-color);
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.config-item textarea {
+    min-height: 100px; /* Default min height */
+    resize: vertical;
+}
+
+/* Chat Panel (Right Side) */
+.chat-panel {
+    flex: 2; /* Takes up 2 parts of the space */
+    background-color: var(--panel-bg-color);
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* For flex child with overflow */
+    max-height: calc(100vh - 120px); /* Consistent with config panel */
+}
+
+.chat-panel h2 {
+    color: var(--header-text-color);
+    margin-bottom: 0px;
+    font-size: 1.4em;
+}
+.chat-panel .chat-subtitle {
+    font-size: 0.85em;
+    font-weight: normal;
+    color: var(--text-color);
+    opacity: 0.9;
+}
+
+.chat-window-container {
+    background-color: var(--bg-color); /* Slightly darker inner chat area */
+    border: 1px solid var(--input-border-color);
+    border-radius: 6px;
+    margin-top: 15px;
+    padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* For flex child with overflow */
+}
+
+.chat-header {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: var(--header-text-color);
+    margin-bottom: 5px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--input-border-color);
+}
+.chat-description {
+    font-size: 0.85em;
+    color: var(--text-color);
+    opacity: 0.8;
+    margin-bottom: 15px;
+}
+
+
+#chat-display-wrapper {
+    flex-grow: 1;
+    overflow-y: auto; /* This makes the message area scrollable */
+    margin-bottom: 15px;
+    padding-right: 5px; /* Space for scrollbar */
+}
+
+#chat-display {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.message-bubble {
+    max-width: 75%;
+    padding: 10px 15px;
+    border-radius: 15px;
+    word-wrap: break-word;
+    line-height: 1.4;
+}
+
+.message-bubble.user {
+    background-color: var(--user-message-bg);
+    color: #e0e0ff; /* Lighter text for user messages */
+    align-self: flex-end;
+    border-bottom-right-radius: 5px; /* Chat bubble tail effect */
+}
+
+.message-bubble.assistant {
+    background-color: var(--assistant-message-bg);
+    color: var(--text-color);
+    align-self: flex-start;
+    border-bottom-left-radius: 5px; /* Chat bubble tail effect */
+}
+.message-bubble.system { /* For errors or system messages */
+    background-color: #4a2a2a;
+    color: #ffc0c0;
+    align-self: center;
+    font-style: italic;
+    font-size: 0.9em;
+    max-width: 90%;
+    text-align: center;
+}
+
+.chat-input-area {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding-top: 10px;
+    border-top: 1px solid var(--input-border-color);
+}
+
+.chat-input-area input[type="text"] {
+    flex-grow: 1;
+    padding: 12px;
+    background-color: var(--input-bg-color);
+    border: 1px solid var(--input-border-color);
+    color: var(--text-color);
+    border-radius: 20px; /* Rounded input */
+    font-size: 0.95em;
+    outline: none;
+}
+.chat-input-area input[type="text"]:focus {
+    border-color: var(--accent-color);
+}
+
+.chat-input-area button {
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    border: none;
+    border-radius: 50%; /* Circular button */
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.chat-input-area button:hover {
+    background-color: #a0b0ff; /* Lighter accent on hover */
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track-color);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-color);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #5a5a7a;
+}

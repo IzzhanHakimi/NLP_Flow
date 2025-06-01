@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow - Intelligent Auto-Reply Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>🌊 Flow - Intelligent Auto-Reply Assistant</h1>
+            <p class="subtitle">Simulates an intelligent assistant that replies on your behalf when you're busy, using RAG and your defined persona.</p>
+        </header>
+
+        <div class="main-content">
+            <aside class="configuration-panel">
+                <h2>Configuration</h2>
+                <div class="config-item">
+                    <label for="api_key">Google API Key (Gemini)</label>
+                    <input type="password" id="api_key" placeholder="••••••••••••••••••••••">
+                </div>
+                <div class="config-item">
+                    <label for="user_profile">User Profile Data</label>
+                    <span class="info-text">Enter details about the user (schedule, preferences, status). This will be vectorized for RAG.</span>
+                    <textarea id="user_profile" rows="15"></textarea>
+                </div>
+                <div class="config-item">
+                    <label for="user_persona">User Persona Description</label>
+                    <span class="info-text">Describe how the user typically communicates and how 'Flow' should behave.</span>
+                    <textarea id="user_persona" rows="10"></textarea>
+                </div>
+            </aside>
+
+            <main class="chat-panel">
+                <h2>Chat with 'Flow' <span class="chat-subtitle">(as if you are messaging the user)</span></h2>
+                <div class="chat-window-container">
+                    <div class="chat-header">Flow Messenger</div>
+                    <p class="chat-description">Type a message to the user (e.g., Alice). Flow will reply on her behalf.</p>
+                    <div id="chat-display-wrapper">
+                        <div id="chat-display">
+                            <!-- Initial messages from server-side rendering -->
+                            {% for message in chat_history %}
+                                <div class="message-bubble {{ message.role }}">
+                                    <div class="message-content">{{ message.content }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="message-input" placeholder="Type a message to the user (e.g., Alice). Flow will reply on her behalf.">
+                        <button id="send-button" title="Send Message">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20px" height="20px"><path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" /></svg>
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+</body>
+</html>
