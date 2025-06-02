@@ -20,15 +20,35 @@
                     <label for="api_key">Google API Key (Gemini)</label>
                     <input type="password" id="api_key" placeholder="••••••••••••••••••••••">
                 </div>
+
+                <div class="config-item">
+                    <label for="persona-template-select">Select Persona Template</label>
+                    <select id="persona-template-select" class="config-input">
+                        <option value="">-- Select a Template or Use Custom --</option>
+                        <option value="alice">Alice Wong (Student)</option>
+                        <option value="john">John Smith (Software Engineer)</option>
+                        <option value="ahmed">Ahmed Al-Fahim (Graphic Designer)</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+
                 <div class="config-item">
                     <label for="user_profile">User Profile Data</label>
                     <span class="info-text">Enter details about the user (schedule, preferences, status). This will be vectorized for RAG.</span>
-                    <textarea id="user_profile" rows="15"></textarea>
+                    <textarea id="user_profile" rows="15" placeholder="Select a template or fill in details. Example:
+- Name: Your Name
+- Role: Your Role
+- Availability: Mon-Fri, 9 AM - 5 PM
+- Preferences: Prefers email for complex topics.
+- Current Status: In a meeting until 3 PM."></textarea>
                 </div>
                 <div class="config-item">
                     <label for="user_persona">User Persona Description</label>
                     <span class="info-text">Describe how the user typically communicates and how 'Flow' should behave.</span>
-                    <textarea id="user_persona" rows="10"></textarea>
+                    <textarea id="user_persona" rows="10" placeholder="Select a template or describe the persona. Example:
+- Respond as [Your Name].
+- Tone: Professional and friendly.
+- If busy: Inform sender and offer to take a message."></textarea>
                 </div>
             </aside>
 

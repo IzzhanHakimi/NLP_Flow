@@ -97,8 +97,10 @@ body {
     margin-bottom: 8px;
 }
 
+/* UPDATED: Added .config-item select to this rule and line-height */
 .config-item input[type="password"],
-.config-item textarea {
+.config-item textarea,
+.config-item select {
     width: 100%;
     padding: 10px;
     background-color: var(--input-bg-color);
@@ -106,12 +108,37 @@ body {
     color: var(--text-color);
     border-radius: 4px;
     font-size: 0.9em;
+    line-height: 1.4; /* Helps with consistent height */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease; /* For focus transitions */
 }
+
+/* Specific styling for select if needed, e.g., for custom arrow */
+/* .config-item select { */
+    /* For a custom dropdown arrow, you would use: */
+    /* appearance: none; */
+    /* -webkit-appearance: none; */
+    /* -moz-appearance: none; */
+    /* background-image: url('your-custom-arrow.svg'); */
+    /* background-repeat: no-repeat; */
+    /* background-position: right 10px center; */
+    /* padding-right: 30px; Adjust to make space for the arrow */
+/* } */
+
 
 .config-item textarea {
     min-height: 100px; /* Default min height */
     resize: vertical;
 }
+
+/* NEW: Consistent focus styles for all config inputs */
+.config-item input[type="password"]:focus,
+.config-item textarea:focus,
+.config-item select:focus {
+    border-color: var(--accent-color);
+    outline: none; /* Remove default browser outline */
+    box-shadow: 0 0 0 2px rgba(137, 153, 255, 0.25); /* Accent color with transparency for a glow */
+}
+
 
 /* Chat Panel (Right Side) */
 .chat-panel {
@@ -208,6 +235,12 @@ body {
     max-width: 90%;
     text-align: center;
 }
+/* Typing indicator style */
+.message-bubble.typing-indicator .message-content {
+    font-style: italic;
+    opacity: 0.7;
+}
+
 
 .chat-input-area {
     display: flex;
