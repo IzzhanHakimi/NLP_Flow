@@ -1,31 +1,22 @@
+// chat.js
 document.addEventListener('DOMContentLoaded', () => {
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-button');
     const chatDisplay = document.getElementById('chat-display');
     const chatDisplayWrapper = document.getElementById('chat-display-wrapper');
     const apiKeyInput = document.getElementById('api_key');
-    const userProfileInput = document.getElementById('user_profile'); // Textarea for profile
-    const userPersonaInput = document.getElementById('user_persona'); // Textarea for persona
-    const personaTemplateSelect = document.getElementById('persona-template-select'); // The new dropdown
+    const userProfileInput = document.getElementById('user_profile');
+    const userPersonaInput = document.getElementById('user_persona');
+    const personaTemplateSelect = document.getElementById('persona-template-select');
 
     let lastMessageTimestamp = 0;
-    const minDelayBetweenBotMessages = 700; // milliseconds
+    const minDelayBetweenBotMessages = 700;
 
-    const placeholderProfile = `Select a template or fill in details. Example:
-- Name: Your Name
-- Role: Your Role
-- Availability: Mon-Fri, 9 AM - 5 PM
-- Preferences: Prefers email for complex topics.
-- Current Status: In a meeting until 3 PM.`;
+    const placeholderProfile = `Select a template or fill in details. Example:\n- Name: Your Name\n- Role: Your Role\n- Availability: Mon-Fri, 9 AM - 5 PM\n- Preferences: Prefers email for complex topics.\n- Current Status: In a meeting until 3 PM.`;
+    const placeholderPersona = `Select a template or describe the persona. Example:\n- Respond as [Your Name].\n- Tone: Professional and friendly.\n- If busy: Inform sender and offer to take a message.`;
 
-    const placeholderPersona = `Select a template or describe the persona. Example:
-- Respond as [Your Name].
-- Tone: Professional and friendly.
-- If busy: Inform sender and offer to take a message.`;
-
-    // --- Persona Templates Data ---
-    const personaTemplates = {
-        alice: {
+    const personaTemplates = { // Same personaTemplates data as before...
+        alice: { /* ... Alice's data ... */ 
             profile: `Alice Wong is a 22-year-old university student pursuing a Bachelor's degree in Computer Science at University of Malaya. She prefers a casual communication style with friendly emojis in informal chats, but expects professional tone during academic discussions. She is fluent in English and conversational Mandarin. Her timezone is GMT+8 (Kuala Lumpur).
 
 Alice is generally available on Wednesday afternoons after 2 PM, Friday evenings after 7 PM, and Saturday mornings before 11 AM. She avoids Monday and Thursday evenings due to part-time shifts at "Bean Theory" café. During exam periods (April-May, October-November), she minimizes social activities.
@@ -81,7 +72,7 @@ Preferred food spots when meeting friends: "Bean Theory" (SS15 Subang), "Niko Ne
     - Acknowledge and relay messages of encouragement if appropriate.
 - Example if busy: "Hey! Alice is probably quite busy with [her part-time shift / classes / studies] right now. She's generally free on Wednesday afternoons after 2 PM or Friday evenings after 7 PM. Would one of those times work to connect, or shall I pass on a message for her? 😊"`
         },
-        john: {
+        john: { /* ... John's data ... */ 
             profile: `Johnathan "John" Smith
 - Role: Senior Software Engineer at "Innovate Solutions Ltd."
 - Timezone: PST (GMT-7) - Seattle, WA.
@@ -114,7 +105,7 @@ Preferred food spots when meeting friends: "Bean Theory" (SS15 Subang), "Niko Ne
     - If a vague technical issue is reported: "Could you please provide more details? e.g., steps to reproduce, error messages, affected environment, and expected vs. actual behavior?"
 - Example (if in focus time): "Hi there. John's in a deep work session on Project Phoenix until about 12 PM PST. If it's a critical production issue (P0/P1), please escalate via the usual channels. Otherwise, he'll review messages after his focus block. 👍"`
         },
-        ahmed: {
+        ahmed: { /* ... Ahmed's data ... */ 
             profile: `Ahmed Al-Fahim
 - Role: Freelance Graphic Designer & Illustrator
 - Timezone: GST (GMT+4) - Dubai, UAE.
@@ -153,44 +144,17 @@ Preferred food spots when meeting friends: "Bean Theory" (SS15 Subang), "Niko Ne
 - Example (new project inquiry): "Hello! Thanks for reaching out. Ahmed is excited to hear about new creative challenges! 🎨 To get started, could you please email a detailed brief of your project to ahmed.designs@example.com? He'll review it and let you know his current availability and how he can help bring your vision to life!"`
         },
         custom: {
-            profile: ``, // Intentionally blank for custom input
-            persona: ``  // Intentionally blank for custom input
+            profile: ``,
+            persona: ``
         }
     };
 
-    // --- Event Listener for Persona Template Selector ---
-    if (personaTemplateSelect) {
-        personaTemplateSelect.addEventListener('change', function() {
-            const selectedTemplateKey = this.value;
-            if (personaTemplates[selectedTemplateKey]) {
-                const template = personaTemplates[selectedTemplateKey];
-                userProfileInput.value = template.profile.trim();
-                userPersonaInput.value = template.persona.trim();
-
-                if (selectedTemplateKey === "custom" || selectedTemplateKey === "") {
-                    userProfileInput.placeholder = placeholderProfile;
-                    userPersonaInput.placeholder = placeholderPersona;
-                     if (selectedTemplateKey === "") { // Clear for "-- Select --"
-                        userProfileInput.value = "";
-                        userPersonaInput.value = "";
-                    }
-                } else {
-                    // Remove placeholder text when a template is loaded
-                    userProfileInput.placeholder = "";
-                    userPersonaInput.placeholder = "";
-                }
-            }
-        });
-    }
-    
-    // Set initial placeholders
-    userProfileInput.placeholder = placeholderProfile;
-    userPersonaInput.placeholder = placeholderPersona;
-
-
-    function addMessageToDisplay(role, content) {
+    function addMessageToDisplay(role, content, isSystemMessage = false) {
         const messageBubble = document.createElement('div');
         messageBubble.classList.add('message-bubble', role.toLowerCase());
+        if (isSystemMessage) {
+            messageBubble.classList.add('system'); // Special class for system messages
+        }
         const messageContentDiv = document.createElement('div');
         messageContentDiv.classList.add('message-content');
         messageContentDiv.textContent = content;
@@ -199,31 +163,92 @@ Preferred food spots when meeting friends: "Bean Theory" (SS15 Subang), "Niko Ne
         chatDisplayWrapper.scrollTop = chatDisplayWrapper.scrollHeight;
     }
 
+    // --- Event Listener for Persona Template Selector ---
+    if (personaTemplateSelect) {
+        personaTemplateSelect.addEventListener('change', async function() { // Make it async
+            const selectedTemplateKey = this.value;
+            const apiKey = apiKeyInput.value.trim();
+
+            if (personaTemplates[selectedTemplateKey]) {
+                const template = personaTemplates[selectedTemplateKey];
+                userProfileInput.value = template.profile.trim();
+                userPersonaInput.value = template.persona.trim();
+
+                if (selectedTemplateKey === "custom" || selectedTemplateKey === "") {
+                    userProfileInput.placeholder = placeholderProfile;
+                    userPersonaInput.placeholder = placeholderPersona;
+                    if (selectedTemplateKey === "") {
+                        userProfileInput.value = "";
+                        userPersonaInput.value = "";
+                    }
+                } else {
+                    userProfileInput.placeholder = "";
+                    userPersonaInput.placeholder = "";
+                }
+            }
+
+            // Clear chat display on frontend
+            chatDisplay.innerHTML = '';
+            addMessageToDisplay('system', `Switched to '${selectedTemplateKey || "Custom"}' persona. Chat history cleared.`, true);
+
+            // Call backend to reset session and RAG state
+            try {
+                const response = await fetch('/reset_session', { // NEW ENDPOINT
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        new_persona_id: selectedTemplateKey,
+                        // Send the new profile/persona data if backend needs to re-initialize RAG with it
+                        user_profile: userProfileInput.value,
+                        user_persona: userPersonaInput.value,
+                        api_key: apiKey // Send API key for re-initialization of RAG components
+                    })
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log("Backend session reset:", result.message);
+                    addMessageToDisplay('system', 'Backend context and chat history have been reset.', true);
+                } else {
+                    const errorResult = await response.json();
+                    console.error("Error resetting backend session:", errorResult.error);
+                    addMessageToDisplay('system', `Error resetting backend: ${errorResult.error}`, true);
+                }
+            } catch (error) {
+                console.error("Network error resetting session:", error);
+                addMessageToDisplay('system', 'Network error trying to reset backend session.', true);
+            }
+        });
+    }
+
+    // Initial placeholders
+    userProfileInput.placeholder = placeholderProfile;
+    userPersonaInput.placeholder = placeholderPersona;
+
+    // processCurrentMessage function remains the same
     async function processCurrentMessage() {
         const messageText = messageInput.value.trim();
         if (!messageText) return;
 
-        const apiKey = apiKeyInput.value.trim(); // Ensure to trim()
-        const userProfile = userProfileInput.value.trim(); // Ensure to trim()
-        const userPersona = userPersonaInput.value.trim(); // Ensure to trim()
+        const apiKey = apiKeyInput.value.trim();
+        const userProfile = userProfileInput.value.trim();
+        const userPersona = userPersonaInput.value.trim();
 
         if (!apiKey) {
-            addMessageToDisplay('system', 'Error: Google API Key is required.');
+            addMessageToDisplay('system', 'Error: Google API Key is required.', true);
             return;
         }
-        if (!userProfile) { // Check if profile is empty after trim
-            addMessageToDisplay('system', 'Error: User Profile Data is required.');
+        if (!userProfile) {
+            addMessageToDisplay('system', 'Error: User Profile Data is required.', true);
             return;
         }
-        if (!userPersona) { // Check if persona is empty after trim
-            addMessageToDisplay('system', 'Error: User Persona Description is required.');
+        if (!userPersona) {
+            addMessageToDisplay('system', 'Error: User Persona Description is required.', true);
             return;
         }
 
         addMessageToDisplay('user', messageText);
         messageInput.value = '';
 
-        // Add a temporary "Flow is typing..." message
         const typingIndicatorId = `typing-${Date.now()}`;
         const typingIndicator = document.createElement('div');
         typingIndicator.id = typingIndicatorId;
@@ -233,39 +258,36 @@ Preferred food spots when meeting friends: "Bean Theory" (SS15 Subang), "Niko Ne
         chatDisplayWrapper.scrollTop = chatDisplayWrapper.scrollHeight;
 
         try {
-            const response = await fetch('/chat', {
+            const response = await fetch('/chat', { // This endpoint remains the same
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', },
                 body: JSON.stringify({
                     message: messageText,
                     api_key: apiKey,
-                    user_profile: userProfile, // Ensure this matches your Flask backend
-                    user_persona: userPersona  // Ensure this matches your Flask backend
+                    user_profile: userProfile,
+                    user_persona: userPersona
                 }),
             });
 
-            // Remove typing indicator regardless of response
             const indicatorToRemove = document.getElementById(typingIndicatorId);
             if (indicatorToRemove) {
                 chatDisplay.removeChild(indicatorToRemove);
             }
 
             const data = await response.json();
-            if (response.ok) {
-                // The actual bot response will be handled by the polling mechanism
-                console.log('Message sent to server buffer:', data);
-            } else {
+            if (!response.ok) {
                 console.error('Error sending message to server:', data);
-                addMessageToDisplay('system', `Error: ${data.error || 'Could not send message.'}`);
+                addMessageToDisplay('system', `Error: ${data.error || 'Could not send message.'}`, true);
+            } else {
+                console.log('Message sent to server buffer:', data);
             }
         } catch (error) {
-            // Remove typing indicator on network error
             const indicatorToRemove = document.getElementById(typingIndicatorId);
             if (indicatorToRemove) {
                 chatDisplay.removeChild(indicatorToRemove);
             }
             console.error('Network error sending message:', error);
-            addMessageToDisplay('system', 'Error: Network problem, could not send message.');
+            addMessageToDisplay('system', 'Error: Network problem, could not send message.', true);
         }
     }
 
@@ -277,36 +299,29 @@ Preferred food spots when meeting friends: "Bean Theory" (SS15 Subang), "Niko Ne
         }
     });
 
+    // pollForBotResponse function remains the same
     async function pollForBotResponse() {
         try {
-            const response = await fetch('/get_bot_response');
-            if (!response.ok) {
-                // console.warn('Polling: No new message or server not ready.', response.status);
-                return;
-            }
-            if (response.status === 204) { // No content
-                return;
-            }
+            const response = await fetch('/get_bot_response'); // This endpoint remains the same
+            if (!response.ok) return;
+            if (response.status === 204) return;
 
             const data = await response.json();
-
             if (data && data.content) {
                 const now = Date.now();
                 const delayNeeded = Math.max(0, minDelayBetweenBotMessages - (now - lastMessageTimestamp));
-
                 setTimeout(() => {
                     addMessageToDisplay(data.role || 'assistant', data.content);
                     lastMessageTimestamp = Date.now();
                 }, delayNeeded);
             }
         } catch (error) {
-            // console.error('Polling error:', error); // Can be noisy if server is temporarily down
+            // console.error('Polling error:', error);
         }
     }
 
     setInterval(pollForBotResponse, 1200);
 
-    // Auto-scroll to bottom on initial load if there's history
     if (chatDisplayWrapper) {
         chatDisplayWrapper.scrollTop = chatDisplayWrapper.scrollHeight;
     }
