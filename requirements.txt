@@ -5,3 +5,5 @@ langchain_google_genai==2.1.5
 langchain_text_splitters==0.3.8
 langgraph==0.4.8
 nltk==3.9.1
+chromadb
+langgraph
