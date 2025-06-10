@@ -8,6 +8,7 @@ from typing import List # Added for type hint
 
 # Import your RAG logic module
 import rag
+import os
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16) # Make sure this is strong for production
@@ -407,4 +408,5 @@ if __name__ == '__main__':
     app.config['APP_PROCESSING_LOCKS'] = {}
     app.config['APP_BURST_TIMERS'] = {}
     app.config['APP_PENDING_BOT_RESPONSES'] = {}
-    app.run(debug=True, threaded=True, use_reloader=False) # use_reloader=False is important with threads
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=True, threaded=True, use_reloader=False)  # use_reloader=False is important with threads
