@@ -409,4 +409,4 @@ if __name__ == '__main__':
     app.config['APP_BURST_TIMERS'] = {}
     app.config['APP_PENDING_BOT_RESPONSES'] = {}
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=True, threaded=True, use_reloader=False)  # use_reloader=False is important with threads
+    app.run(host='0.0.0.0', port=port, threaded=True, use_reloader=False)  # use_reloader=False is important with threads
